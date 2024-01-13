@@ -8,18 +8,11 @@ exports.addToCart = async (req,res) => {
         if(isCart){
             return res.json({message: "This product is already added in cart"});
         }
-        let isProduct = await productModel.findOne({_id: cartItem, isDelete: false});
-        if(!isProduct){
-            return res.json({message: "This product is out of stock"});
-        }
 
         isCart = await cartModel.create({
             user: req.user._id,
             cartItem,
-            quntity,
-            productPrice: isProduct.productPrice,
-            productName: isProduct.productName,
-            productImage: isProduct.productImage
+            quntity
         })
         isCart.save();
         res.json({isCart, message: "Product added in cart"});
@@ -31,8 +24,18 @@ exports.addToCart = async (req,res) => {
 
 exports.getAllCart = async (req,res) => {
     try {
-        let allCart = await cartModel.find({user: req.user._id, isDelete: false});
-        res.json(allCart);
+        let allCart = await cartModel.find({user: req.user._id, isDelete: false}).populate('cartItem');
+        let cart = allCart.map((item) => ({
+            _id : item._id ,
+            user: req.user._id,
+            cartItem: item.cartItem._id,
+            productName : item.cartItem.productName,
+            productImage : item.cartItem.productImage,
+            productPrice : item.cartItem.productPrice,
+            quantity : item.quntity,
+            isDelete: item.isDelete
+        }))
+        res.json(cart);
     } catch (err) {
         console.log(err);
         res.status(500).json({message: "Internal Server Error"});
@@ -42,11 +45,21 @@ exports.getAllCart = async (req,res) => {
 exports.specificCart = async (req,res) => {
     try {
         const {cartItem} = req.body;
-        let cart = await cartModel.findOne({cartItem: cartItem, isDelete: false});
+        let cart = await cartModel.find({cartItem: cartItem, isDelete: false}).populate('cartItem');
         if(!cart){
             return res.json({message:"No data found"})
         }
-        res.json(cart);
+        let allcart = cart.map((item) => ({
+            _id : item._id ,
+            user: req.user._id,
+            cartItem: item.cartItem._id,
+            productName : item.cartItem.productName,
+            productImage : item.cartItem.productImage,
+            productPrice : item.cartItem.productPrice,
+            quantity : item.quntity,
+            isDelete: item.isDelete
+        }))
+        res.json(allcart);
     } catch (err) {
         console.log(err);
         res.status(500).json({message: "Internal Server Error"});

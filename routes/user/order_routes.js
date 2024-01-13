@@ -1,11 +1,10 @@
 const express = require('express');
 const { verifyToken } = require('../../helpers/tokenVerify');
 const { addOrder, getOrder, deleteOrder } = require('../../controller/user/order_controller');
-const { tokenAdmin } = require('../../helpers/tokenAdmin');
 const orderRoute = express.Router();
 
-orderRoute.post('/add-order', verifyToken, tokenAdmin, addOrder);
-orderRoute.get('/get-order', verifyToken, tokenAdmin, getOrder);
-orderRoute.delete('/delete-order', verifyToken, tokenAdmin, deleteOrder);
+orderRoute.post('/add-order', verifyToken, addOrder);
+orderRoute.get('/get-order', verifyToken, getOrder);
+orderRoute.delete('/delete-order', verifyToken, deleteOrder);
 
 module.exports = orderRoute

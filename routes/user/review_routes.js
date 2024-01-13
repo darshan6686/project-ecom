@@ -5,10 +5,10 @@ const { addReivew, getAllReview, specificReivew, updateReview, deleteReview } = 
 const { tokenAdmin } = require('../../helpers/tokenAdmin');
 const reviewRoute = express.Router();
 
-reviewRoute.post('/add-review', verifyToken, tokenAdmin, upload.single('productImage') ,addReivew);
-reviewRoute.get('/getall-review', verifyToken, tokenAdmin, getAllReview);
-reviewRoute.get('/get-review', verifyToken, tokenAdmin, specificReivew);
-reviewRoute.put('/update-review', verifyToken, tokenAdmin, updateReview);
-reviewRoute.delete('/delete-review', verifyToken, tokenAdmin, deleteReview);
+reviewRoute.post('/add-review', verifyToken, upload.single('productImage') ,addReivew);
+reviewRoute.get('/getall-review', verifyToken, getAllReview);
+reviewRoute.get('/get-review', verifyToken, specificReivew);
+reviewRoute.put('/update-review', verifyToken, updateReview);
+reviewRoute.delete('/delete-review', verifyToken, deleteReview);
 
 module.exports = reviewRoute
