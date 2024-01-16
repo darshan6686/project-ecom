@@ -25,8 +25,6 @@ exports.addReivew = async (req,res) => {
             cartItem,
             title,
             productImage: productpath,
-            username: isUser.name,
-            profileImage: isUser.profileImage,
             rating
         })
 
@@ -46,8 +44,16 @@ exports.addReivew = async (req,res) => {
 
 exports.getAllReview = async (req,res) => {
     try {
-        let isUser = await reviewModel.find({user: req.user._id, isDelete: false});
-        res.json(isUser);
+        let allReview = await reviewModel.find({user: req.user._id, isDelete: false}).populate('cartItem').populate('user');
+        let review = allReview.map((item) => ({
+            _id : item._id ,
+            user: req.user._id,
+            name: item.user.name,
+            cartItem: item.cartItem._id,
+            title: item.title,
+            productImage : item.cartItem.productImage
+        }))
+        res.json(review);
     } catch (err) {
         console.log(err);
         res.status(500).json({message: "Internal Server Error"});
@@ -57,16 +63,19 @@ exports.getAllReview = async (req,res) => {
 exports.specificReivew = async (req,res) => {
     try {
         const {cartItem} = req.body;
-        let isReview = await reviewModel.findOne({user: req.user.id, isDelete: false});
-        if(!isReview){
-            return res.json({message: "you are not give review"});
+        let allReview = await reviewModel.find({_id: cartItem, isDelete: false}).populate('cartItem').populate('user');
+        if(!allReview){
+            return res.json('review not found')
         }
-
-        isReview = await reviewModel.find({cartItem: cartItem, isDelete: false});
-        if(!isReview){
-            return res.status(404).json({message:"This item does not have a review."});
-        }
-        res.json(isReview);
+        let review = allReview.map((item) => ({
+            _id : item._id ,
+            user: req.user._id,
+            name: item.user.name,
+            cartItem: item.cartItem._id,
+            title: item.title,
+            productImage : item.cartItem.productImage
+        }))
+        res.json(review);
     } catch (err) {
         console.log(err);
         res.status(500).json({message: "Internal Server Error"});

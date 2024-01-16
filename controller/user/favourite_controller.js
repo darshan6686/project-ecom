@@ -1,5 +1,4 @@
 const favouriteModel = require('../../model/user/favourite_model');
-const productModel = require('../../model/admin/product_model');
 
 exports.addToFavourite = async (req,res) => {
     try {
@@ -9,14 +8,9 @@ exports.addToFavourite = async (req,res) => {
             return res.json({message: "This product is already added in favourite list"});
         }
 
-        let isProduct = await productModel.findOne({_id: cartItem, isDelete: false});
-
         let favourite = await favouriteModel.create({
             user: req.user._id,
-            cartItem,
-            productImage: isProduct.productImage,
-            productName: isProduct.productName,
-            productPrice: isProduct.productPrice
+            cartItem
         })
         favourite.save();
         res.json({favourite, message: "product is added in your faourite list"});
@@ -28,8 +22,16 @@ exports.addToFavourite = async (req,res) => {
 
 exports.getAllFavourite = async (req,res) => {
     try {
-        let isFavourite = await favouriteModel.find({user: req.user._id, isDelete: false});
-        res.json(isFavourite);
+        let allFavourite = await favouriteModel.find({user: req.user._id, isDelete: false}).populate('cartItem');
+        let favourite = allFavourite.map((item) => ({
+            _id : item._id ,
+            user: req.user._id,
+            cartItem: item.cartItem._id,
+            productName : item.cartItem.productName,
+            productImage : item.cartItem.productImage,
+            productPrice : item.cartItem.productPrice,
+        }))
+        res.json(favourite);
     } catch (err) {
         console.log(err);
         res.status(500).json({message: "Internal Server Error"});
@@ -39,12 +41,19 @@ exports.getAllFavourite = async (req,res) => {
 exports.specificFavourite = async (req,res) => {
     try {
         const {cartItem} = req.body;
-        let isFavourite = await favouriteModel.find({user: req.user._id, isDelete: false});
-        isFavourite = await favouriteModel.findOne({cartItem: cartItem, isDelete: false});
-        if(!isFavourite){
-            return res.json({message: "This product does not found in your favourite list"});
+        let allFavourite = await favouriteModel.find({cartItem: cartItem, isDelete: false}).populate('cartItem');
+        if(!allFavourite){
+            return res.json({message:"No data found"})
         }
-        res.json(isFavourite);
+        let favourite = allFavourite.map((item) => ({
+            _id : item._id ,
+            user: req.user._id,
+            cartItem: item.cartItem._id,
+            productName : item.cartItem.productName,
+            productImage : item.cartItem.productImage,
+            productPrice : item.cartItem.productPrice,
+        }))
+        res.json(favourite);
     } catch (err) {
         console.log(err);
     }

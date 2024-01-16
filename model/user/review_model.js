@@ -13,15 +13,6 @@ const reviewSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'products'
     },
-    username: {
-        type: String
-    },
-    profileImage: {
-        type: String
-    },
-    productImage: {
-        type: String
-    },
     rating: {
         type: Number,
         min: 0,
