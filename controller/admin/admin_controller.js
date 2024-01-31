@@ -1,5 +1,5 @@
 const userModel = require('../../model/user_model');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 exports.getProfile = async (req,res) => {

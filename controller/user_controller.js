@@ -1,5 +1,5 @@
 const userModel = require('../model/user_model');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 exports.signUp = async (req,res) => {
@@ -17,7 +17,7 @@ exports.signUp = async (req,res) => {
 
         let filepath;
         if(req.file){
-            filepath = `${req.file.path}`
+            filepath = `${req.file.path}`;
         }
         user = await userModel.create({
             name, email,
